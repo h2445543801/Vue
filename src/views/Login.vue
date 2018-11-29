@@ -1,21 +1,24 @@
 <template>
   <div class="login">
     <div class="container">
-      <el-form :model="loginForm" :rules="rules" ref="ruleForm" class="demo-ruleForm"  >
+      <el-form :model="loginForm" :rules="rules" ref="loginForm" class="demo-ruleForm"  >
           <img src="../assets/avatar.jpg" alt="" class="avatar">
         <el-form-item prop="username">
-          <el-input v-model="loginForm.username" prefix-icon="myicon myicon-user"></el-input>
+          <el-input v-model="loginForm.username" prefix-icon="myicon myicon-user" placeholder="用户"></el-input>
         </el-form-item>
         <el-form-item prop="password">
-          <el-input v-model="loginForm.password" prefix-icon="myicon myicon-key"></el-input>
+          <el-input v-model="loginForm.password" prefix-icon="myicon myicon-key" placeholder="密码" type="password"></el-input>
         </el-form-item>
-        <el-button type="primary" class="login-btn" >登录</el-button>
+        <el-button type="primary" class="login-btn" @click='login("loginForm")'>登录</el-button>
       </el-form>
     </div>
 
   </div>
 </template>
 <script>
+
+import {login} from '@/api/index.js'
+
 export default {
   data () {
     return {
@@ -25,12 +28,30 @@ export default {
       },
       rules: {
         username: [
-          { required: true, message: '请输入活动名称', trigger: 'blur' }
+          { required: true, message: '请输入用户名', trigger: 'blur' }
         ],
         password: [
-          { required: true, message: '请输入活动名称', trigger: 'blur' }
+          { required: true, message: '请输入密码', trigger: 'blur' }
         ]
       }
+    }
+  },
+  methods: {
+    login (formname) {
+      // 实现用户输入的验证：如果用户输入不合法，则取消当前请求
+      this.$refs[formname].validate((valid) => {
+        if (valid) {
+          console.log(123)
+          // 调用接口，发送请求
+          login(this.loginForm)
+            .then((result) => {
+              console.log(result)
+            })
+        } else {
+          this.$message.error('登陆失败，输入数据不完整')
+          return false
+        }
+      })
     }
   }
 }

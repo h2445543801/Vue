@@ -5,7 +5,7 @@ import App from './App'
 import router from './router/index.js'
 
 // 引入index.scss文件
-import './styles/index.css'
+import './styles/index.scss'
 
 // 引入element-ui
 import ElementUI from 'element-ui'
