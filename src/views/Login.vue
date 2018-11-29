@@ -41,11 +41,20 @@ export default {
       // 实现用户输入的验证：如果用户输入不合法，则取消当前请求
       this.$refs[formname].validate((valid) => {
         if (valid) {
-          console.log(123)
+          // console.log(123)
           // 调用接口，发送请求
           login(this.loginForm)
             .then((result) => {
-              console.log(result)
+              // console.log(result)
+              if (result.meta.status === 200) {
+                // 将token 实现本地存储
+                localStorage.setItem('itcast_token', result.data.token)
+                // 实现跳转主页
+                this.$router.push({name: 'Home'})
+              } else {
+                console.log(123)
+                this.$message.error(result.meta.msg)
+              }
             })
         } else {
           this.$message.error('登陆失败，输入数据不完整')
@@ -56,7 +65,7 @@ export default {
   }
 }
 </script>
-<style lang="less" scoped>
+<style lang="scss" scoped>
 .login {
   position: fixed;
   width: 100%;

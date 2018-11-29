@@ -14,6 +14,16 @@ Vue.use(ElementUI)
 
 Vue.config.productionTip = false
 
+// 添加导航守卫
+router.beforeEach((to, from, next) => {
+  console.log(to, '---------nihao')
+  var token = localStorage.getItem('itcast_token')
+  if (token || to.path === '/login') {
+    next()
+  } else {
+    next({path: '/login'})
+  }
+})
 /* eslint-disable no-new */
 new Vue({
   el: '#app',
