@@ -1,6 +1,6 @@
 import axios from 'axios'
 
-axios.defaults.baseURL = 'http://localhost:8888/api/private/v1/'
+axios.defaults.baseURL = 'http://127.0.0.1:8888/api/private/v1/'
 
 // 为axios添加拦截器
 // 1.获取token值 有token值就通过请求头的方式获取
@@ -26,7 +26,15 @@ export const login = (pa) => {
 
 // 获取所有用户数据
 export const GetUserList = (pa) => {
-  return axios.post('users', {params: pa})
+  return axios.get('users', {params: pa})
+    .then((result) => {
+      return result.data
+    })
+}
+
+// 实现用户数据新增
+export const addUser = (pa) => {
+  return axios.post('users', pa)
     .then((result) => {
       return result.data
     })
