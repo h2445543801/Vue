@@ -1,11 +1,11 @@
 <template>
   <div class="home">
     <el-container>
-      <el-aside width="200px">
+      <el-aside width="auto">
         <div class="logo"></div>
         <el-menu
           default-active="2"
-          class="el-menu-vertical-demo"
+          class="el-menu-vertical-demo el-menu-admin"
           @open="handleOpen"
           @close="handleClose"
           background-color="#545c64"
@@ -13,6 +13,7 @@
           active-text-color="#ffd04b"
           :unique-opened='true'
           :router='true'
+          :collapse ='!collapse'
         >
           <el-submenu index="1">
             <template slot="title">
@@ -29,7 +30,7 @@
           <el-submenu index="2">
             <template slot="title">
               <i class="el-icon-location"></i>
-              <span>用户管理</span>
+              <span>权限管理</span>
             </template>
             <el-menu-item index="#">
               <template slot="title">
@@ -48,7 +49,11 @@
         </el-menu>
       </el-aside>
       <el-container>
-        <el-header>Header</el-header>
+        <el-header>
+          <a href="javascript:;" class="myicon myicon-menu toggle-btn" @click = 'collapse =!collapse'></a>
+          <span class="system-title">电商后台管理系统</span>
+          <div><span class="welcome">欢迎你:***</span> <span>退出</span></div>
+        </el-header>
         <el-main>Main</el-main>
       </el-container>
     </el-container>
@@ -57,7 +62,9 @@
 <script>
 export default {
   data () {
-    return {}
+    return {
+      collapse: 'false'
+    }
   },
   methods: {
     handleOpen (key, keyPath) {
