@@ -112,7 +112,7 @@
                 size="mini"
                 type="info"
                 icon="el-icon-share"
-                @click="showGrant(scope.$index, scope.row)"
+                @click="showGrant(scope.row)"
               ></el-button>
             </el-tooltip>
           </template>
@@ -126,7 +126,7 @@
       @current-change="handleCurrentChange"
       :current-page="pagenum"
       :page-sizes="[1, 2, 3, 4]"
-      :page-size="1"
+      :page-size="4"
       layout="total, sizes, prev, pager, next, jumper"
       :total="total"
     >
@@ -249,16 +249,68 @@
         >确 定</el-button>
       </div>
     </el-dialog>
+
+    <!-- 授权身份 -->
+    <el-dialog
+      title="编辑用户"
+      :visible.sync="grantdialogFormVisible"
+    >
+      <el-form
+        :model="grantform"
+        label-width="100px"
+        :rules="rules"
+        ref="grantform"
+      >
+        <el-form-item
+          label="用户名"
+          prop="username"
+        >
+          <el-input
+            v-model="grantform.username"
+            auto-complete="off"
+            disabled
+          ></el-input>
+        </el-form-item>
+        <el-form-item label="角色">
+          <template>
+            <el-select
+              v-model="grantform.rid"
+              placeholder="请选择"
+              @change='getRid'
+            >
+              <el-option
+                v-for="item in rolesList"
+                :key="item.id"
+                :label="item.roleName"
+                :value="item.id"
+              >
+              </el-option>
+            </el-select>
+          </template>
+        </el-form-item>
+      </el-form>
+      <div
+        slot="footer"
+        class="dialog-footer"
+      >
+        <el-button @click="grantdialogFormVisible = false">取 消</el-button>
+        <el-button
+          type="primary"
+          @click="grantUser ('grantform')"
+        >确 定</el-button>
+      </div>
+    </el-dialog>
   </div>
 </template>
 <script>
-import { GetUserList, addUser, editUser, deleteUser } from '@/api'
+import { GetUserList, addUser, editUser, deleteUser, getRolesList, grantUserById } from '@/api'
 export default {
   data () {
     return {
       // 控制添加新用户弹出框的隐藏
       adddialogFormVisible: false,
       editdialogFormVisible: false,
+      grantdialogFormVisible: false,
       addform: {
         username: '',
         password: '',
@@ -270,6 +322,11 @@ export default {
         id: '',
         email: '',
         mobile: ''
+      },
+      grantform: {
+        username: '',
+        id: '',
+        rid: ''
       },
       rules: {
         username: [
@@ -291,7 +348,10 @@ export default {
       pagesize: 10,
       userList: [],
       serachkey: '',
-      userState: ''
+      userState: '',
+      rolesList: [],
+      options: [],
+      value: ''
     }
   },
   mounted () {
@@ -305,23 +365,25 @@ export default {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
-      }).then(() => {
-        deleteUser(id).then(res => {
-          console.log(res)
-          if (res.meta.status === 200) {
-            this.$message({
-              type: 'success',
-              message: '删除成功'
-            })
-            this.init()
-          }
-        })
-      }).catch(() => {
-        this.$message({
-          type: 'success',
-          message: '已取消删除'
-        })
       })
+        .then(() => {
+          deleteUser(id).then(res => {
+            console.log(res)
+            if (res.meta.status === 200) {
+              this.$message({
+                type: 'success',
+                message: '删除成功'
+              })
+              this.init()
+            }
+          })
+        })
+        .catch(() => {
+          this.$message({
+            type: 'success',
+            message: '已取消删除'
+          })
+        })
     },
     // 编辑用户
     // 实现用户数据的编辑
@@ -329,15 +391,14 @@ export default {
       this.$refs[formname].validate(valid => {
         if (valid) {
           // 调用接口实现用户数据的编辑
-          editUser(this.editform)
-            .then(res => {
-              if (res.meta.status === 200) {
-                this.$message.success('编辑成功')
-                this.editdialogFormVisible = false
-                // 实现数据的刷新
-                this.init()
-              }
-            })
+          editUser(this.editform).then(res => {
+            if (res.meta.status === 200) {
+              this.$message.success('编辑成功')
+              this.editdialogFormVisible = false
+              // 实现数据的刷新
+              this.init()
+            }
+          })
         } else {
           this.$message.error('用户数据输入不完整')
           return false
@@ -404,7 +465,43 @@ export default {
       this.editform.mobile = row.mobile
       this.editform.id = row.id
     },
-
+    // 授权身份
+    grantUser () {
+      console.log(this.grantform.rid)
+      if (this.grantform.rid) {
+        grantUserById(this.grantform).then(res => {
+          if (res.meta.status === 200) {
+            this.grantdialogFormVisible = false
+            this.$message.success('用户授权角色成功')
+            this.init()
+          }
+        })
+      } else {
+        this.$message.error('用户数据输入不完整')
+        return false
+      }
+    },
+    getRid () {
+      console.log(this.grantform, '2121')
+    },
+    showGrant (row) {
+      // console.log(row, '111')
+      // console.log(this.grantform, '000')
+      this.grantdialogFormVisible = true
+      this.grantform.id = row.id
+      this.grantform.username = row.username
+      // 将当前用户角色加载到选择框上
+      this.grantform.rid = row.role_name
+      console.log(row, '名字')
+      // 获取角色  加载
+      getRolesList().then(res => {
+        // console.log(res, '666')
+        if (res.meta.status === 200) {
+          this.rolesList = res.data
+          console.log(this.rolesList, '123')
+        }
+      })
+    },
     handleSizeChange (val) {
       this.pagesize = val
       this.init()

@@ -55,3 +55,19 @@ export const deleteUser = (id) => {
       return result.data
     })
 }
+
+// 获取角色数据数据
+export const getRolesList = () => {
+  return axios.get(`roles`)
+    .then((result) => {
+      return result.data
+    })
+}
+
+// 获取角色数据数据
+export const grantUserById = (pa) => {
+  return axios.put(`users/${pa.id}/role`, {rid: pa.rid})
+    .then((result) => {
+      return result.data
+    })
+}
