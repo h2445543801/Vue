@@ -49,8 +49,8 @@ export const editUser = (pa) => {
 }
 
 // 编辑用户数据
-export const deleteUser = (pa) => {
-  return axios.delete(`users/${pa.id}`, pa)
+export const deleteUser = (id) => {
+  return axios.delete(`users/${id}`)
     .then((result) => {
       return result.data
     })

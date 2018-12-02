@@ -112,7 +112,7 @@
                 size="mini"
                 type="info"
                 icon="el-icon-share"
-                @click="showGrantDialog(scope.$index, scope.row)"
+                @click="showGrant(scope.$index, scope.row)"
               ></el-button>
             </el-tooltip>
           </template>
@@ -134,7 +134,7 @@
 
     <!-- 添加用户弹出框 -->
     <el-dialog
-      title="收货地址"
+      title="添加用户"
       :visible.sync="adddialogFormVisible"
     >
       <el-form
@@ -252,7 +252,7 @@
   </div>
 </template>
 <script>
-import { GetUserList, addUser, editUser } from '@/api'
+import { GetUserList, addUser, editUser, deleteUser } from '@/api'
 export default {
   data () {
     return {
@@ -298,6 +298,31 @@ export default {
     this.init()
   },
   methods: {
+    // 删除本条数据
+    handleDelete (id) {
+      console.log(id)
+      this.$confirm(`此操作将永久删除id号为${id}的数据,是否继续？`, '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        deleteUser(id).then(res => {
+          console.log(res)
+          if (res.meta.status === 200) {
+            this.$message({
+              type: 'success',
+              message: '删除成功'
+            })
+            this.init()
+          }
+        })
+      }).catch(() => {
+        this.$message({
+          type: 'success',
+          message: '已取消删除'
+        })
+      })
+    },
     // 编辑用户
     // 实现用户数据的编辑
     editUser (formname) {
@@ -379,10 +404,7 @@ export default {
       this.editform.mobile = row.mobile
       this.editform.id = row.id
     },
-    // 删除本条数据
-    handleDelete (index, row) {
-      console.log(index, row)
-    },
+
     handleSizeChange (val) {
       this.pagesize = val
       this.init()
