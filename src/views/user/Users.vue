@@ -86,7 +86,7 @@
               <el-button
                 size="mini"
                 icon="el-icon-edit"
-                @click="handleEdit(scope.$index, scope.row)"
+                @click="handleEdit(scope.row)"
               ></el-button>
             </el-tooltip>
             <el-tooltip
@@ -99,7 +99,7 @@
                 size="mini"
                 type="danger"
                 icon="el-icon-delete"
-                @click="handleDelete(scope.$index, scope.row)"
+                @click="handleDelete(scope.row.id)"
               ></el-button>
             </el-tooltip>
             <el-tooltip
@@ -112,7 +112,7 @@
                 size="mini"
                 type="info"
                 icon="el-icon-share"
-                @click="handleDelete(scope.$index, scope.row)"
+                @click="showGrantDialog(scope.$index, scope.row)"
               ></el-button>
             </el-tooltip>
           </template>
@@ -195,18 +195,79 @@
         >确 定</el-button>
       </div>
     </el-dialog>
+
+    <!-- 编辑用户 -->
+    <el-dialog
+      title="编辑用户"
+      :visible.sync="editdialogFormVisible"
+    >
+      <el-form
+        :model="editform"
+        label-width="100px"
+        :rules="rules"
+        ref="editform"
+      >
+        <el-form-item
+          label="用户名"
+          prop="username"
+        >
+          <el-input
+            v-model="editform.username"
+            auto-complete="off"
+            disabled
+          ></el-input>
+        </el-form-item>
+
+        <el-form-item
+          label="邮箱"
+          prop="email"
+        >
+          <el-input
+            v-model="editform.email"
+            auto-complete="off"
+          ></el-input>
+        </el-form-item>
+
+        <el-form-item
+          label="手机号"
+          prop="mobile"
+        >
+          <el-input
+            v-model="editform.mobile"
+            auto-complete="off"
+          ></el-input>
+        </el-form-item>
+      </el-form>
+      <div
+        slot="footer"
+        class="dialog-footer"
+      >
+        <el-button @click="editdialogFormVisible = false">取 消</el-button>
+        <el-button
+          type="primary"
+          @click="editUser('editform')"
+        >确 定</el-button>
+      </div>
+    </el-dialog>
   </div>
 </template>
 <script>
-import { GetUserList, addUser } from '@/api'
+import { GetUserList, addUser, editUser } from '@/api'
 export default {
   data () {
     return {
       // 控制添加新用户弹出框的隐藏
       adddialogFormVisible: false,
+      editdialogFormVisible: false,
       addform: {
         username: '',
         password: '',
+        email: '',
+        mobile: ''
+      },
+      editform: {
+        username: '',
+        id: '',
         email: '',
         mobile: ''
       },
@@ -214,20 +275,20 @@ export default {
         username: [
           { required: true, message: '请输入用户名', trigger: 'blur' }
         ],
-        password: [
-          { required: true, message: '请输入密码', trigger: 'blur' }
-        ],
+        password: [{ required: true, message: '请输入密码', trigger: 'blur' }],
         email: [
           { required: true, message: '请输入邮箱地址', trigger: 'blur' },
-          { type: 'email', message: '请输入正确的邮箱地址', trigger: 'blur,change' }
+          {
+            type: 'email',
+            message: '请输入正确的邮箱地址',
+            trigger: 'blur,change'
+          }
         ],
-        mobile: [
-          { required: true, message: '电话不能为空' }
-        ]
+        mobile: [{ required: true, message: '电话不能为空' }]
       },
       total: 0,
       pagenum: 1,
-      pagesize: 1,
+      pagesize: 10,
       userList: [],
       serachkey: '',
       userState: ''
@@ -237,6 +298,28 @@ export default {
     this.init()
   },
   methods: {
+    // 编辑用户
+    // 实现用户数据的编辑
+    editUser (formname) {
+      this.$refs[formname].validate(valid => {
+        if (valid) {
+          // 调用接口实现用户数据的编辑
+          editUser(this.editform)
+            .then(res => {
+              if (res.meta.status === 200) {
+                this.$message.success('编辑成功')
+                this.editdialogFormVisible = false
+                // 实现数据的刷新
+                this.init()
+              }
+            })
+        } else {
+          this.$message.error('用户数据输入不完整')
+          return false
+        }
+      })
+    },
+
     //   实现用户新增
     addUser (formname) {
       this.$refs[formname].validate(valid => {
@@ -265,12 +348,14 @@ export default {
     },
     //   实现用户数据搜索
     searchUsers () {
-      GetUserList({query: this.serachkey, pagenum: 1, pagesize: 10}).then(result => {
-        if (result.meta.status === 200) {
-          this.userList = result.data.users
-          this.total = result.data.total
+      GetUserList({ query: this.serachkey, pagenum: 1, pagesize: 10 }).then(
+        result => {
+          if (result.meta.status === 200) {
+            this.userList = result.data.users
+            this.total = result.data.total
+          }
         }
-      })
+      )
     },
     //   获取用户数据
     init () {
@@ -285,10 +370,14 @@ export default {
         }
       })
     },
-
     //   编辑本条数据
-    handleEdit (index, row) {
-      console.log(index, row)
+    handleEdit (row) {
+      console.log(row)
+      this.editdialogFormVisible = true
+      this.editform.username = row.username
+      this.editform.email = row.email
+      this.editform.mobile = row.mobile
+      this.editform.id = row.id
     },
     // 删除本条数据
     handleDelete (index, row) {

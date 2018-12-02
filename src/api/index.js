@@ -39,3 +39,19 @@ export const addUser = (pa) => {
       return result.data
     })
 }
+
+// 编辑用户数据
+export const editUser = (pa) => {
+  return axios.put(`users/${pa.id}`, pa)
+    .then((result) => {
+      return result.data
+    })
+}
+
+// 编辑用户数据
+export const deleteUser = (pa) => {
+  return axios.delete(`users/${pa.id}`, pa)
+    .then((result) => {
+      return result.data
+    })
+}
