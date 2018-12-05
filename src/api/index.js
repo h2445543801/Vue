@@ -71,3 +71,43 @@ export const grantUserById = (pa) => {
       return result.data
     })
 }
+
+// 实现单个用户状态的授权
+export const changeUserState = (uid, type) => {
+  return axios.put(`users/${uid}/state/${type}`)
+    .then((result) => {
+      return result.data
+    })
+}
+
+// 获取所有权限
+export const getAllRights = (type) => {
+  return axios.get(`rights/${type}`)
+    .then((result) => {
+      return result.data
+    })
+}
+
+// 实现当前角色的权限发分配
+export const grantroleroles = (roleId, rids) => {
+  return axios.post(`roles/${roleId}/rights`, {rids: rids})
+    .then((result) => {
+      return result.data
+    })
+}
+
+// 实现去除权限标签
+export const deleteroleright = (roleId, rightId) => {
+  return axios.delete(`roles/${roleId}/rights/${rightId}`)
+    .then((result) => {
+      return result.data
+    })
+}
+
+// 添加角色
+export const addRole = (pa) => {
+  return axios.post('roles', pa)
+    .then(res => {
+      return res.data
+    })
+}

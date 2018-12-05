@@ -70,6 +70,7 @@
               v-model="scope.row.mg_state"
               active-color="#13ce66"
               inactive-color="#ff4949"
+              @change="changeUserState(scope.row)"
             >
             </el-switch>
           </template>
@@ -303,7 +304,7 @@
   </div>
 </template>
 <script>
-import { GetUserList, addUser, editUser, deleteUser, getRolesList, grantUserById } from '@/api'
+import { GetUserList, addUser, editUser, deleteUser, getRolesList, grantUserById, changeUserState } from '@/api'
 export default {
   data () {
     return {
@@ -345,7 +346,7 @@ export default {
       },
       total: 0,
       pagenum: 1,
-      pagesize: 10,
+      pagesize: 4,
       userList: [],
       serachkey: '',
       userState: '',
@@ -358,6 +359,16 @@ export default {
     this.init()
   },
   methods: {
+    // 实现单个用户状态授权
+    changeUserState (row) {
+      console.log(row)
+      changeUserState(row.id, row.mg_state).then(res => {
+        console.log(res, 'changeUserState')
+        if (res.meta.status === 200) {
+          this.$message.info('修改状态成功')
+        }
+      })
+    },
     // 删除本条数据
     handleDelete (id) {
       console.log(id)
@@ -492,13 +503,12 @@ export default {
       this.grantform.username = row.username
       // 将当前用户角色加载到选择框上
       this.grantform.rid = row.role_name
-      console.log(row, '名字')
+      // console.log(row, '名字')
       // 获取角色  加载
       getRolesList().then(res => {
         // console.log(res, '666')
         if (res.meta.status === 200) {
           this.rolesList = res.data
-          console.log(this.rolesList, '123')
         }
       })
     },

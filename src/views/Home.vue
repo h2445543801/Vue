@@ -33,16 +33,16 @@
               <i class="el-icon-location"></i>
               <span>权限管理</span>
             </template>
-            <el-menu-item index="2-1">
-              <template slot="title">
-                <i class="el-icon-menu"></i>
-                <span>权限列表</span>
-              </template>
-            </el-menu-item>
-            <el-menu-item index="2-2">
+            <el-menu-item index="roles">
               <template slot="title">
                 <i class="el-icon-menu"></i>
                 <span>角色列表</span>
+              </template>
+            </el-menu-item>
+            <el-menu-item index="rigth">
+              <template slot="title">
+                <i class="el-icon-menu"></i>
+                <span>权限列表</span>
               </template>
             </el-menu-item>
           </el-submenu>
@@ -98,8 +98,9 @@
         <el-header>
           <a href="javascript:;" class="myicon myicon-menu toggle-btn" @click = 'collapse =!collapse'></a>
           <span class="system-title">电商后台管理系统</span>
-          <div><span class="welcome">欢迎你:***</span> <span>退出</span></div>
+          <div><span class="welcome" >欢迎你: <span style="color:skyblue;">神童铭</span></span> <span>退出</span></div>
         </el-header>
+
         <el-main>
           <router-view></router-view>
         </el-main>
